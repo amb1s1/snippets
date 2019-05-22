@@ -1,0 +1,24 @@
+!
+hostname {{ device.hostname }}
+!
+spanning-tree mode {{ device.stp_mode }}
+!
+aaa authorization exec default local
+!
+no aaa root
+!
+{% for user in device.users %}
+username {{ user.name }} privilege {{ user.priviledge }} role {{ user.role  }} secret {{ user.hash }} {{ user.secret }}
+{% endfor %}
+!
+{% for interface in device.interfaces %}
+interface {{ interface.ifname }}
+  ip address {{ interface.ip }}/{{ interface.netmask }}
+  {% if interface.state == "up" %}
+  no shutdown
+  {% else %}
+  shutdown
+  {% endif %}
+!
+{% endfor %}
+end
